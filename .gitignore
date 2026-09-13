@@ -222,6 +222,8 @@ frontend/node_modules/
 frontend/.next/
 frontend/.env.local
 frontend/.env*.local
+!frontend/lib/
+!frontend/lib/*.ts
 bff/.env
 service_a/.env
 keys/*.pem
