@@ -17,6 +17,7 @@ from .security import extract_roles, generate_csrf_token, generate_session_id, l
 from .sessions import SessionStore
 
 settings = get_settings()
+cookie_domain = settings.session_cookie_domain
 
 
 @asynccontextmanager
@@ -115,6 +116,7 @@ async def auth_callback(request: Request):
         samesite="lax",
         max_age=settings.session_ttl_seconds,
         path="/",
+        domain=cookie_domain,
     )
     return redirect_response
 
@@ -138,6 +140,7 @@ async def auth_logout(
         secure=settings.session_secure_cookies,
         httponly=True,
         samesite="lax",
+        domain=cookie_domain,
     )
     return response
 

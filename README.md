@@ -70,6 +70,7 @@ If you want roles copied into the internal JWT, expose them in a claim such as `
 ### `bff/.env`
 
 Copy `bff/.env.example`, fill in the Auth0 values, and replace `OAUTH_STATE_SECRET` with a real random secret before starting the BFF.
+Leave `SESSION_COOKIE_DOMAIN` empty for the default localhost setup; set it to a shared parent domain when the frontend and BFF run on different hosts under the same site.
 
 ### `service_a/.env`
 
