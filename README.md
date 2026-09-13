@@ -114,23 +114,29 @@ Copy `frontend/.env.local.example`.
 
 ## 5. Install dependencies
 
+Create and use a separate virtual environment inside each Python project so the BFF and downstream service keep their dependencies isolated.
+
 ### BFF
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r bff/requirements.txt
+```powershell
+python -m venv bff\.venv
+bff\.venv\Scripts\Activate.ps1
+python -m pip install -r bff\requirements.txt
 ```
 
 ### Downstream service
 
-```bash
-pip install -r service_a/requirements.txt
+```powershell
+python -m venv service_a\.venv
+service_a\.venv\Scripts\Activate.ps1
+python -m pip install -r service_a\requirements.txt
 ```
 
 ### Frontend
 
-```bash
+Use npm in the Next.js project directory to install the dependencies from `frontend\package.json` and generate or update `frontend\package-lock.json`.
+
+```powershell
 cd frontend
 npm install
 cd ..
