@@ -36,10 +36,14 @@ export async function logoutAction(formData: FormData) {
     redirect("/dashboard?error=The+BFF+could+not+complete+logout.");
   }
 
+  let logoutUrl = "";
+
   try {
     const { logout_url } = await logout(csrfToken);
-    redirect(logout_url);
+    logoutUrl = logout_url;
   } catch {
     redirect("/dashboard?error=The+BFF+could+not+complete+logout.");
   }
+
+  redirect(logoutUrl);
 }

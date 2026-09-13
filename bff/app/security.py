@@ -56,5 +56,10 @@ def require_csrf(request: Request, session: dict[str, Any]) -> None:
         return
 
     csrf_header = request.headers.get("x-csrf-token")
-    if not csrf_header or csrf_header != session.get("csrf_token"):
+    session_csrf = session.get("csrf_token")
+    if (
+        not csrf_header
+        or not isinstance(session_csrf, str)
+        or not secrets.compare_digest(csrf_header, session_csrf)
+    ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="CSRF validation failed")

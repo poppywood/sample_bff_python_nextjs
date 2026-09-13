@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime, timedelta
 from urllib.parse import urlencode
 
 import httpx
@@ -97,6 +98,7 @@ async def auth_callback(request: Request):
 
     session_id = generate_session_id()
     csrf_token = generate_csrf_token()
+    session_expiry = datetime.now(UTC) + timedelta(seconds=settings.session_ttl_seconds)
     session_payload = {
         "user_id": userinfo["sub"],
         "email": userinfo.get("email"),
@@ -117,6 +119,7 @@ async def auth_callback(request: Request):
         max_age=settings.session_ttl_seconds,
         path="/",
         domain=cookie_domain,
+        expires=session_expiry,
     )
     return redirect_response
 
@@ -129,6 +132,7 @@ async def auth_logout(
 ):
     require_csrf(request, session)
     await session_store.delete(request.state.session_id)
+    request.session.clear()
     logout_url = "https://{domain}/v2/logout?{query}".format(
         domain=settings.auth0_domain,
         query=urlencode({"client_id": settings.auth0_client_id, "returnTo": settings.frontend_origin}),
@@ -141,6 +145,13 @@ async def auth_logout(
         httponly=True,
         samesite="lax",
         domain=cookie_domain,
+    )
+    response.delete_cookie(
+        "bff_oauth_state",
+        path="/",
+        secure=settings.session_secure_cookies,
+        httponly=True,
+        samesite="lax",
     )
     return response
 
