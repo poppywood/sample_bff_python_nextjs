@@ -69,7 +69,7 @@ If you want roles copied into the internal JWT, expose them in a claim such as `
 
 ### `bff/.env`
 
-Copy `bff/.env.example` and fill in the Auth0 values.
+Copy `bff/.env.example`, fill in the Auth0 values, and replace `OAUTH_STATE_SECRET` with a real random secret before starting the BFF.
 
 ### `service_a/.env`
 
@@ -145,5 +145,5 @@ Open `http://localhost:3000`.
 ## Local development tips
 
 - Redis session keys use the `bff:session:` prefix.
-- The sample data store in `service_a` is in-memory and resets on restart.
+- `service_a` stores sample orders in Redis by default (`redis://localhost:6379/1`) so its data stays consistent across workers/processes.
 - If Auth0 roles are not configured, the starter safely falls back to an empty roles list.

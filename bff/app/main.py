@@ -21,6 +21,8 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if not settings.oauth_state_secret:
+        raise RuntimeError("OAUTH_STATE_SECRET must be set before starting the BFF")
     load_private_key()
     redis = Redis.from_url(settings.redis_url, decode_responses=True)
     await redis.ping()
@@ -130,7 +132,13 @@ async def auth_logout(
         query=urlencode({"client_id": settings.auth0_client_id, "returnTo": settings.frontend_origin}),
     )
     response = JSONResponse({"logout_url": logout_url})
-    response.delete_cookie(settings.session_cookie_name, path="/")
+    response.delete_cookie(
+        settings.session_cookie_name,
+        path="/",
+        secure=settings.session_secure_cookies,
+        httponly=True,
+        samesite="lax",
+    )
     return response
 
 

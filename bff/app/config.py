@@ -51,7 +51,7 @@ def get_settings() -> Settings:
         session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "bff_session"),
         session_ttl_seconds=_get_int("SESSION_TTL_SECONDS", 60 * 60 * 8),
         session_secure_cookies=_get_bool("SESSION_SECURE_COOKIES", False),
-        oauth_state_secret=os.getenv("OAUTH_STATE_SECRET", "replace-me"),
+        oauth_state_secret=os.getenv("OAUTH_STATE_SECRET", ""),
         internal_jwt_private_key_path=os.getenv("INTERNAL_JWT_PRIVATE_KEY_PATH", "keys/internal_private.pem"),
         internal_jwt_issuer=os.getenv("INTERNAL_JWT_ISSUER", "sample-bff"),
         internal_jwt_audience=os.getenv("INTERNAL_JWT_AUDIENCE", "service-a"),
