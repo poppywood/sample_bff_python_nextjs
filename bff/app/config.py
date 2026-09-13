@@ -29,7 +29,6 @@ class Settings:
     bff_base_url: str
     redis_url: str
     session_cookie_name: str
-    csrf_cookie_name: str
     session_ttl_seconds: int
     session_secure_cookies: bool
     oauth_state_secret: str
@@ -50,7 +49,6 @@ def get_settings() -> Settings:
         bff_base_url=os.getenv("BFF_BASE_URL", "http://localhost:8000").rstrip("/"),
         redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
         session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "bff_session"),
-        csrf_cookie_name=os.getenv("CSRF_COOKIE_NAME", "bff_csrf"),
         session_ttl_seconds=_get_int("SESSION_TTL_SECONDS", 60 * 60 * 8),
         session_secure_cookies=_get_bool("SESSION_SECURE_COOKIES", False),
         oauth_state_secret=os.getenv("OAUTH_STATE_SECRET", "replace-me"),

@@ -114,15 +114,6 @@ async def auth_callback(request: Request):
         max_age=settings.session_ttl_seconds,
         path="/",
     )
-    redirect_response.set_cookie(
-        key=settings.csrf_cookie_name,
-        value=csrf_token,
-        httponly=False,
-        secure=settings.session_secure_cookies,
-        samesite="lax",
-        max_age=settings.session_ttl_seconds,
-        path="/",
-    )
     return redirect_response
 
 
@@ -140,7 +131,6 @@ async def auth_logout(
     )
     response = JSONResponse({"logout_url": logout_url})
     response.delete_cookie(settings.session_cookie_name, path="/")
-    response.delete_cookie(settings.csrf_cookie_name, path="/")
     return response
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from itertools import count
 
 from fastapi import Depends, FastAPI, status
@@ -10,6 +11,7 @@ from .auth import AuthenticatedUser, require_authenticated_user
 app = FastAPI(title="service-a")
 _order_ids = count(1)
 _orders: list[dict[str, object]] = []
+_orders_lock = asyncio.Lock()
 
 
 class OrderCreate(BaseModel):
@@ -32,7 +34,9 @@ async def health() -> dict[str, str]:
 @app.get("/orders", response_model=list[Order])
 async def list_orders(user: AuthenticatedUser = Depends(require_authenticated_user)) -> list[Order]:
     _ = user
-    return [Order(**order) for order in _orders]
+    async with _orders_lock:
+        snapshot = [Order(**order) for order in _orders]
+    return snapshot
 
 
 @app.post("/orders", response_model=Order, status_code=status.HTTP_201_CREATED)
@@ -40,11 +44,12 @@ async def create_order(
     payload: OrderCreate,
     user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> Order:
-    order = {
-        "id": next(_order_ids),
-        "item": payload.item,
-        "quantity": payload.quantity,
-        "created_by": user.email or user.sub,
-    }
-    _orders.append(order)
+    async with _orders_lock:
+        order = {
+            "id": next(_order_ids),
+            "item": payload.item,
+            "quantity": payload.quantity,
+            "created_by": user.email or user.sub,
+        }
+        _orders.append(order)
     return Order(**order)
