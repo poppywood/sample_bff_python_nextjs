@@ -65,6 +65,38 @@ Create an Auth0 Regular Web Application and set:
 
 If you want roles copied into the internal JWT, expose them in a claim such as `https://example.com/roles` and set `AUTH0_ROLES_CLAIM` to match.
 
+Suggested exact Auth0 checklist
+Use this exact checklist:
+
+Create Regular Web Application
+Copy:
+- Domain
+- Client ID
+- Client Secret
+
+Set callback URL:
+- http://localhost:8000/auth/callback
+
+Set logout URL:
+- http://localhost:3000
+
+Set web origin:
+- http://localhost:3000
+
+Enable at least one login connection
+
+Create a test user
+
+Optionally create roles
+
+Optionally add Post-Login Action for namespaced roles claim
+
+Put values into BFF .env
+
+Run Redis, service, BFF, frontend
+
+Test login end-to-end
+
 ## 4. Configure environment files
 
 ### `bff/.env`
