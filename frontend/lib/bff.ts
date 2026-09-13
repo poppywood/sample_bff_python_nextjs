@@ -24,6 +24,13 @@ export type Order = {
   created_by: string;
 };
 
+export type Note = {
+  id: number;
+  title: string;
+  content: string;
+  created_by: string;
+};
+
 async function getCookieHeader() {
   const cookieStore = await cookies();
   return cookieStore.toString();
@@ -63,6 +70,21 @@ export async function getOrders(): Promise<Order[]> {
   return (await response.json()) as Order[];
 }
 
+export async function getNotes(): Promise<Note[]> {
+  const response = await fetch(`${bffBaseUrl}/api/service-b/notes`, {
+    headers: {
+      cookie: await getCookieHeader(),
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to load service B data from the BFF.");
+  }
+
+  return (await response.json()) as Note[];
+}
+
 export async function createOrder(input: { item: string; quantity: number; csrfToken: string }) {
   const response = await fetch(`${bffBaseUrl}/api/service-a/orders`, {
     method: "POST",
@@ -80,6 +102,26 @@ export async function createOrder(input: { item: string; quantity: number; csrfT
 
   if (!response.ok) {
     throw new Error(await response.text() || "Failed to create sample data through the BFF.");
+  }
+}
+
+export async function createNote(input: { title: string; content: string; csrfToken: string }) {
+  const response = await fetch(`${bffBaseUrl}/api/service-b/notes`, {
+    method: "POST",
+    headers: {
+      cookie: await getCookieHeader(),
+      "content-type": "application/json",
+      "x-csrf-token": input.csrfToken,
+    },
+    body: JSON.stringify({
+      title: input.title,
+      content: input.content,
+    }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(await response.text() || "Failed to create service B data through the BFF.");
   }
 }
 

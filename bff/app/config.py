@@ -35,8 +35,8 @@ class Settings:
     oauth_state_secret: str
     internal_jwt_private_key_path: str
     internal_jwt_issuer: str
-    internal_jwt_audience: str
     service_a_base_url: str
+    service_b_base_url: str
 
 
 @lru_cache(maxsize=1)
@@ -56,6 +56,6 @@ def get_settings() -> Settings:
         oauth_state_secret=os.getenv("OAUTH_STATE_SECRET", ""),
         internal_jwt_private_key_path=os.getenv("INTERNAL_JWT_PRIVATE_KEY_PATH", "keys/internal_private.pem"),
         internal_jwt_issuer=os.getenv("INTERNAL_JWT_ISSUER", "sample-bff"),
-        internal_jwt_audience=os.getenv("INTERNAL_JWT_AUDIENCE", "service-a"),
         service_a_base_url=os.getenv("SERVICE_A_BASE_URL", "http://localhost:8001").rstrip("/"),
+        service_b_base_url=os.getenv("SERVICE_B_BASE_URL", "http://localhost:8002").rstrip("/"),
     )

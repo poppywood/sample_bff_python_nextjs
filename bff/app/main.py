@@ -14,11 +14,13 @@ from starlette.middleware.sessions import SessionMiddleware
 from .auth import oauth
 from .config import get_settings
 from .proxy import proxy_request
+from .routes import get_service_routes
 from .security import extract_roles, generate_csrf_token, generate_session_id, load_private_key, require_csrf
 from .sessions import SessionStore
 
 settings = get_settings()
 cookie_domain = settings.session_cookie_domain
+service_routes = get_service_routes()
 
 
 @asynccontextmanager
@@ -170,11 +172,21 @@ async def me(session: dict[str, object] = Depends(get_current_session)):
     }
 
 
-@app.api_route("/api/service-a/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
-async def service_a_proxy(
+@app.api_route("/api/{service_name}/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
+async def service_proxy(
+    service_name: str,
     path: str,
     request: Request,
     session: dict[str, object] = Depends(get_current_session),
 ):
     require_csrf(request, session)
-    return await proxy_request(request, settings.service_a_base_url, path, session)
+    service_route = service_routes.get(service_name)
+    if service_route is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown downstream service")
+    return await proxy_request(
+        request,
+        service_route.service_base_url,
+        path,
+        session,
+        audience=service_name,
+    )

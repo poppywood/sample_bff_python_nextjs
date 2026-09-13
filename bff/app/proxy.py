@@ -38,12 +38,18 @@ def _response_headers(headers: Iterable[tuple[str, str]]) -> dict[str, str]:
     }
 
 
-async def proxy_request(request: Request, service_base_url: str, path: str, session: dict[str, object]) -> Response:
+async def proxy_request(
+    request: Request,
+    service_base_url: str,
+    path: str,
+    session: dict[str, object],
+    audience: str,
+) -> Response:
     client: httpx.AsyncClient = request.app.state.http_client
     upstream_url = f"{service_base_url}/{path.lstrip('/')}"
     body = await request.body()
     headers = _forward_headers(request)
-    headers["authorization"] = "Bearer " + mint_service_token(session)
+    headers["authorization"] = "Bearer " + mint_service_token(session, audience)
 
     try:
         upstream_response = await client.request(

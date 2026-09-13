@@ -21,7 +21,7 @@ export default function HomePage() {
           <li>Auth0 login handled by FastAPI/Authlib.</li>
           <li>Redis-backed session cookies with a CSRF token for mutating requests.</li>
           <li>Short-lived internal RS256 JWTs minted by the BFF for downstream APIs.</li>
-          <li>A sample orders flow that lists and creates data via the BFF only.</li>
+          <li>Two downstream demo flows that create orders and notes through the BFF only.</li>
         </ul>
       </section>
     </main>

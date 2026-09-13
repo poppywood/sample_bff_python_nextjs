@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { createOrderAction, logoutAction } from "@/app/dashboard/actions";
-import { getCurrentUser, getOrders } from "@/lib/bff";
+import { createNoteAction, createOrderAction, logoutAction } from "@/app/dashboard/actions";
+import { getCurrentUser, getNotes, getOrders } from "@/lib/bff";
 
 export default async function DashboardPage({
   searchParams,
@@ -11,6 +11,7 @@ export default async function DashboardPage({
   const params = searchParams ? await searchParams : undefined;
   const me = await getCurrentUser();
   const orders = me ? await getOrders() : [];
+  const notes = me ? await getNotes() : [];
 
   return (
     <main>
@@ -41,7 +42,7 @@ export default async function DashboardPage({
           </article>
 
           <article className="card">
-            <h2>Sample service data</h2>
+            <h2>Service A demo</h2>
             <p>This form submits to a Next.js server action, which forwards the session cookies and `X-CSRF-Token` header to the BFF.</p>
             <form className="stack" action={createOrderAction}>
               <input type="hidden" name="csrfToken" value={me.csrfToken} />
@@ -63,6 +64,32 @@ export default async function DashboardPage({
                 </li>
               ))}
               {orders.length === 0 ? <li>No sample orders yet.</li> : null}
+            </ul>
+          </article>
+
+          <article className="card">
+            <h2>Service B demo</h2>
+            <p>Use the second downstream service through the BFF to create and list demo notes end to end.</p>
+            <form className="stack" action={createNoteAction}>
+              <input type="hidden" name="csrfToken" value={me.csrfToken} />
+              <label>
+                Title
+                <input name="title" defaultValue="Welcome note" minLength={1} maxLength={100} required />
+              </label>
+              <label>
+                Content
+                <input name="content" defaultValue="Created through service B." minLength={1} maxLength={280} required />
+              </label>
+              <button type="submit">Create note via BFF</button>
+            </form>
+
+            <ul className="stack order-list">
+              {notes.map((note) => (
+                <li key={note.id}>
+                  <strong>#{note.id}</strong> {note.title}: {note.content} <em>({note.created_by})</em>
+                </li>
+              ))}
+              {notes.length === 0 ? <li>No demo notes yet.</li> : null}
             </ul>
           </article>
 

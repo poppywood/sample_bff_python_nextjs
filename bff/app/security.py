@@ -34,12 +34,12 @@ def extract_roles(userinfo: dict[str, Any], claim_name: str) -> list[str]:
     return []
 
 
-def mint_service_token(session: dict[str, Any]) -> str:
+def mint_service_token(session: dict[str, Any], audience: str) -> str:
     settings = get_settings()
     now = datetime.now(UTC)
     payload = {
         "iss": settings.internal_jwt_issuer,
-        "aud": settings.internal_jwt_audience,
+        "aud": audience,
         "sub": session["user_id"],
         "email": session.get("email"),
         "roles": session.get("roles", []),

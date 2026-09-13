@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createOrder, logout } from "@/lib/bff";
+import { createNote, createOrder, logout } from "@/lib/bff";
 
 function getText(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -23,6 +23,25 @@ export async function createOrderAction(formData: FormData) {
     await createOrder({ item, quantity, csrfToken });
   } catch {
     redirect("/dashboard?error=The+BFF+could+not+create+the+sample+order.");
+  }
+
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
+}
+
+export async function createNoteAction(formData: FormData) {
+  const title = getText(formData, "title");
+  const content = getText(formData, "content");
+  const csrfToken = getText(formData, "csrfToken");
+
+  if (!title || !content || !csrfToken || content.length > 280) {
+    redirect("/dashboard?error=Please+provide+a+valid+note+title+and+content.");
+  }
+
+  try {
+    await createNote({ title, content, csrfToken });
+  } catch {
+    redirect("/dashboard?error=The+BFF+could+not+create+the+service+B+note.");
   }
 
   revalidatePath("/dashboard");
