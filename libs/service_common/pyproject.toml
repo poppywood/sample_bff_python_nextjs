@@ -1,0 +1,17 @@
+[project]
+name = "service-common"
+version = "0.1.0"
+description = "Shared code for sample_bff_python_nextjs downstream services (service_a, service_b, ...)"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.116.1",
+    "PyJWT[crypto]>=2.13.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["service_common*"]

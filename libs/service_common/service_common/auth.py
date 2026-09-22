@@ -27,7 +27,7 @@ def _load_public_key() -> str:
 def _settings() -> tuple[str, str]:
     return (
         os.getenv("INTERNAL_JWT_ISSUER", "sample-bff"),
-        os.getenv("INTERNAL_JWT_AUDIENCE", "service-b"),
+        os.getenv("INTERNAL_JWT_AUDIENCE", ""),
     )
 
 

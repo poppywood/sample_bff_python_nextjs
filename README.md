@@ -5,6 +5,7 @@ This repository contains a small browser-facing BFF starter with:
 - `bff/` – FastAPI BFF for Auth0 login, Redis-backed browser sessions, CSRF protection, and proxying.
 - `service_a/` – sample downstream FastAPI service protected by short-lived BFF-issued RS256 JWTs.
 - `service_b/` – second sample downstream FastAPI service protected by short-lived BFF-issued RS256 JWTs.
+- `libs/service_common/` – shared library used by `service_a` and `service_b` (currently: internal JWT verification/auth dependency).
 - `frontend/` – Next.js App Router example that logs in through the BFF and reads/writes sample data only through the BFF.
 - `keys/` – local development location for internal RS256 signing keys.
 
@@ -22,6 +23,7 @@ This repository contains a small browser-facing BFF starter with:
 bff/
 service_a/
 service_b/
+libs/service_common/
 frontend/
 keys/
 docker-compose.yml
@@ -132,6 +134,8 @@ python -m pip install -r bff\requirements.txt
 
 ### Downstream service
 
+`service_a\requirements.txt` installs the shared `libs/service_common` package in editable mode, so run `pip install` from the repository root so the relative path resolves correctly.
+
 ```powershell
 python -m venv service_a\.venv
 service_a\.venv\Scripts\Activate.ps1
@@ -139,6 +143,8 @@ python -m pip install -r service_a\requirements.txt
 ```
 
 ### Second downstream service
+
+`service_b\requirements.txt` also installs `libs/service_common` in editable mode; run `pip install` from the repository root.
 
 ```powershell
 python -m venv service_b\.venv
@@ -201,6 +207,15 @@ Open `http://localhost:3000`.
 - Internal service JWTs are scoped to a different issuer/audience than Auth0 tokens.
 - `SESSION_SECURE_COOKIES=false` is for local HTTP development only; turn it on under HTTPS.
 - Auth0 credentials and generated keys must stay local and must not be committed.
+
+## Shared library (`libs/service_common`)
+
+`service_a` and `service_b` both need to verify BFF-issued internal JWTs the same way, so that logic lives in `libs/service_common/service_common/auth.py` instead of being duplicated per service:
+
+- `AuthenticatedUser` – shared pydantic model for the decoded token claims.
+- `require_authenticated_user` – FastAPI dependency that validates the `Authorization: Bearer` header against `INTERNAL_JWT_PUBLIC_KEY_PATH`, `INTERNAL_JWT_ISSUER`, and `INTERNAL_JWT_AUDIENCE`.
+
+Each service still sets its own `INTERNAL_JWT_AUDIENCE` in its `.env` file, so the shared dependency behaves per-service without any code duplication. Both `service_a/requirements.txt` and `service_b/requirements.txt` install `libs/service_common` with `pip install -e ./libs/service_common`, so any change to the shared library is picked up immediately by both services without reinstalling. Add future cross-service code (e.g. shared models, Redis helpers) to `libs/service_common` rather than copying it between services.
 
 ## Local development tips
 

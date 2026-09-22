@@ -8,7 +8,7 @@ from fastapi import Depends, FastAPI, Request, status
 from pydantic import BaseModel, Field
 from redis.asyncio import Redis
 
-from .auth import AuthenticatedUser, require_authenticated_user
+from service_common.auth import AuthenticatedUser, require_authenticated_user
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/2")
 NOTE_IDS_KEY = "service-b:notes:next-id"
